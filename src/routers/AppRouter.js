@@ -11,6 +11,7 @@ import { AuthRouter } from './AuthRouter';
 import { login } from '../actions/auth';
 import { PrivateRoute } from './PrivateRoute';
 import { PublicRoute } from './PublicRoute';
+import { startLoadingNotes } from '../actions/notes';
 
 export const AppRouter = () => {
 
@@ -21,10 +22,12 @@ export const AppRouter = () => {
     const [ isLoggedIn, setIsLoggedIn ] = useState( false );
 
     useEffect(() => {
-        firebase.auth().onAuthStateChanged( user => {
+        firebase.auth().onAuthStateChanged( async user => {
             if ( user?.uid ) {
                 dispatch( login( user.uid, user.displayName ) );
                 setIsLoggedIn( true );
+
+                dispatch( startLoadingNotes( user.uid ) );
             } else {
                 setIsLoggedIn( false );
             };
@@ -35,7 +38,18 @@ export const AppRouter = () => {
     }, [ dispatch, setCheking, setIsLoggedIn ]);
 
     if ( cheking ) {
-        return <p>Cargando...</p>;
+        return (
+            <div className="loading__content">
+                <div className="loading__sk-chase">
+                    <div className="loading__sk-chase-dot"></div>
+                    <div className="loading__sk-chase-dot"></div>
+                    <div className="loading__sk-chase-dot"></div>
+                    <div className="loading__sk-chase-dot"></div>
+                    <div className="loading__sk-chase-dot"></div>
+                    <div className="loading__sk-chase-dot"></div>
+                </div>
+            </div>
+        );
     };
 
     return (
